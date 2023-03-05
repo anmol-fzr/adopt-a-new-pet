@@ -1,13 +1,16 @@
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
-import Router from './Router'
 import { BrowserRouter } from "react-router-dom"
+import { MantineProvider } from '@mantine/core';
+import Router from './Router'
 import './styles/index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
-      <Router />
+      <MantineProvider withGlobalStyles withNormalizeCSS>
+        <Router />
+      </MantineProvider>
     </BrowserRouter>
-  </StrictMode>
+  </StrictMode>,
 )

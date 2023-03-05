@@ -1,29 +1,20 @@
-import { MantineProvider } from '@mantine/core';
-import { AnimatePresence } from "framer-motion";
-import { Suspense, lazy } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Suspense,lazy } from "react"
+import { Routes, Route } from "react-router-dom"
+import Loader from "./Components/UI/Loader"; 
+import general from "./utils/routes";
 
 
-// Components
-import Loader from "./Components/UI/Loader"
 
-// Screens
-const Home = lazy(() => import("./Screens/Home/Home"));
+const NotFound = lazy(() => import("./Screens/NotFound/NotFound")); 
+const Home = lazy(() => import("./Screens/Home/Home")); 
 
 export default function Router() {
   return (
     <Suspense fallback={<Loader fullscreen={true} />} >
-
-      <AnimatePresence presenceAffectsLayout >
-        <MantineProvider theme={{ colorScheme: 'dark' }} >
-
-          <Routes>
-            <Route path="/" element={<Home />} />
-          </Routes>
-
-        </MantineProvider>
-      </AnimatePresence>
-
+      <Routes>
+        <Route path={general.index} element={<Home/>} />
+        <Route path={general.notFound} element={<NotFound />} />
+      </Routes>
     </Suspense>
-  );
-} 
+  )
+}
