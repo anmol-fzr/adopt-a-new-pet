@@ -1,6 +1,7 @@
 import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "firebase/auth";
 import { auth, GoogleAuth } from "../../firebase/firebaseConfig";
 import { useNavigate } from "react-router-dom"
+import { container } from "../../styles/style";
 // import { useAtom } from "jotai"
 // import { login, name, profilePhoto } from "../../utils/store";
 
@@ -56,8 +57,8 @@ export default function Login({ }) {
     // })
 
     return (
-        <section className="bg-gray-200 min-h-screen flex items-center justify-center">
-            <div className="bg-gray-50 flex rounded-2xl shadow-lg max-w-3xl p-5 items-center">
+        <section className={`  ${container.scrollPadding}   min-h-screen flex items-center justify-center`}>
+            <div className={`  bg-gray-50 flex rounded-2xl shadow-lg max-w-3xl p-5 items-center`}>
 
                 <div className="w-full px-8 md:px-16">
                     <h2 className="font-bold text-2xl text-[#002D74]">Login</h2>

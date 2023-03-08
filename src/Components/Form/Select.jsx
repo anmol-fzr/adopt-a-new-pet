@@ -34,8 +34,8 @@ export default function Select({ label, options, optional = false, isMulti = fal
                     ...theme,
                     colors: {
                         ...theme.colors,
-                        primary25: "#bfdbfe",
-                        primary: "#60a5fa",
+                        primary25: "#c7d2fe",
+                        primary: "#4f46e5",
                     },
                 })}
             />

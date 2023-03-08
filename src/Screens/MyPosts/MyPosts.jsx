@@ -29,7 +29,6 @@ import { colors, healths, breeds, injuries } from "../../utils/options"
 import { animalObject } from "../../utils/extras"
 import { Toaster, SuccessToast, ErrorToast } from "../../Components/Toasts"
 
-
 // console.clear()
 const uid = localStorage.getItem("uid")
 const postsCollectionRef = collection(db, "posts")
@@ -39,9 +38,8 @@ export default function MyPosts() {
     const [ loggedIn ] = useAtom(login)
     const [ drawers, setDrawers ] = useState({
         edit: false,
-        trash: false
+        trash: false,
     })
-
     const [ displayName ] = useAtom(userName)
     const [ animals, setAnimals ] = useState([])
     const [ newAnimal, setNewAnimal ] = useState(animalObject(displayName, uid, ""))
@@ -56,9 +54,12 @@ export default function MyPosts() {
             setAnimals(arr)
         });
     }
-
+    async function deletePost() {
+        const res = await deleteDoc(doc(db, "posts", newAnimal.uuid))
+        SuccessToast("Post Deleted Succesfully")
+    }
     async function update() {
-        const res = await updateDoc(doc(db, "posts", newAnimal.uuid), newAnimal)
+        await updateDoc(doc(db, "posts", newAnimal.uuid), newAnimal)
         SuccessToast("Post Updated Succesfully")
         setDrawers({ ...drawers, edit: false })
     }
@@ -66,7 +67,6 @@ export default function MyPosts() {
     useEffect(() => {
         fetchMyAnimal();
     }, [])
-
 
     const selects = [
         {
@@ -104,6 +104,7 @@ export default function MyPosts() {
             label: "price",
             type: "number",
             value: newAnimal.price,
+            desc: "in rupees",
             onChange: e => handleChange(e.target, "price")
         },
         {
@@ -134,15 +135,28 @@ export default function MyPosts() {
         setDrawers({ ...drawers, trash: true })
     }
 
-    async function deletePost() {
-        const res = await deleteDoc(doc(db, "posts", newAnimal.uuid))
-        SuccessToast("Post Deleted Succesfully")
-    }
-
-
-
     function filterPost(uuid) {
         return animals.filter(animal => animal.uuid === uuid)[ 0 ]
+    }
+
+    function TrashModal() {
+        return (<Modal title="Do You want to Delete the post?" open={drawers.trash} onClose={() => setDrawers({ ...drawers, trash: false })} >
+            <div className="text-center flex items-center w-full flex-col gap-2 " >
+                do you really want to delete the post with title
+                <p className="font-semibold" >{newAnimal.name}</p>
+                <img src={newAnimal.image} alt="" />
+                <div className="p-2 h-fit w-full flex gap-2 items-center justify-between ">
+                    <button onClick={() => setDrawers({ ...drawers, trash: false })} className={`p-3 px-4 rounded-md bg-gray-200 hover:bg-gray-100 text-gray-700 ${interact.scale} ${interact.shadow} `} >
+                        Cancel
+                    </button>
+                    <button onClick={deletePost} className={`  p-1  px-4 rounded-md flex items-center bg-red-100 hover:bg-red-200 text-red-500 ${interact.scale} ${interact.shadow} `} >
+                        <Icon onClick={trash} icon={<HiOutlineTrash />} color="red" effects={false} />
+                        Delete
+                    </button>
+                </div>
+            </div>
+
+        </Modal>)
     }
 
     return (
@@ -155,44 +169,25 @@ export default function MyPosts() {
                         <Drawer label="Update a Post" open={drawers.edit} onClose={() => setDrawers({ ...drawers, edit: false })} >
                             <div className="h-full flex flex-col gap-2">
                                 {selects.map(({ label, options, value, onChange }) => <Select key={label} value={value} label={label} options={options} onChange={onChange} />)}
-                                {inputs.map(({ label, type, value, onChange }) => <Input key={label} label={label} type={type} value={value} onChange={onChange} />)}
+                                {inputs.map(({ label, type, value, onChange, desc }) => <Input key={label} desc={desc} label={label} type={type} value={value} onChange={onChange} />)}
                                 <img src={newAnimal.image} alt="" />
                                 <Button label="Update" onClick={update} className="w-fit mx-auto" />
                             </div>
                         </Drawer >
 
-                        <Modal title="Do You want to Delete the post?" open={drawers.trash} onClose={() => setDrawers({ ...drawers, trash: false })} >
-                            <div className="text-center" >
-                                do you really want to delete the post with title
-                                <p className="font-medium" >{newAnimal.name}</p>
-                                <div className="p-2 h-fit flex gap-2 items-center justify-between ">
-                                    <button className={`p-3 px-4 rounded-md bg-gray-200 hover:bg-gray-100 text-gray-700 ${interact.scale} ${interact.shadow} `} >
-                                        Cancel
-                                    </button>
-                                    <button onClick={deletePost} className={`  p-1  px-4 rounded-md flex items-center bg-red-100 hover:bg-red-200 text-red-500 ${interact.scale} ${interact.shadow} `} >
-                                        <Icon onClick={trash} icon={<HiOutlineTrash />} color="red" />
-                                        Delete
-                                    </button>
-                                </div>
-                            </div>
-
-                        </Modal>
+                        <TrashModal />
 
                         <div className="flex flex-col gap-2 p-2">
                             <Label label="Animals" optional={true} />
-                            <div className=" columns-2  xl:columns-3 2xl:columns-4 gap-2">
+                            <div className={container.columns}>
                                 {animals.map(({ name, desc, health, injury, color, breed, author, time, uuid, image }) =>
-                                    <Card img={image} other={< Actions trash={() => trash(uuid)} edit={() => edit(uuid)} />} key={name} name={name} desc={desc} health={health} injury={injury} time={String(time)} author={author} color={color} breed={breed} />
+                                    <Card img={image} other={<Actions trash={() => trash(uuid)} edit={() => edit(uuid)} />} key={name} name={name} desc={desc} health={health} injury={injury} time={String(time)} author={author} color={color} breed={breed} />
                                 )}
-
                             </div>
-                        </div>
+                        </div> 
                     </>)
                 : (<h1 className="capitalize text-center m-auto" >login to see your posts</h1>)
-
             }
-
-
         </div >
     )
 }

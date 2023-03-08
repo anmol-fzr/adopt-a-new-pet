@@ -5,9 +5,7 @@ import { useAtom } from "jotai"
 import Drawer from "../../Components/Drawer/Drawer"
 import Button from "../../Components/Form/Button"
 import Select from "../../Components/Form/Select"
-import Input from "../../Components/Form/Input"
-import Label from "../../Components/Form/Label"
-import Card from "../../Components/Card"
+import Input from "../../Components/Form/Input" 
 
 // Styles
 import { container } from "../../styles/style"
@@ -19,7 +17,7 @@ import { animalsData, name as userName } from "../../utils/store"
 
 // Firebase
 import { db } from "../../firebase/firebaseConfig"
-import { collection, getDocs } from "firebase/firestore"
+import { collection, getDocs, query, where } from "firebase/firestore"
 
 
 import { v4 as uuid } from "uuid"
@@ -28,19 +26,31 @@ import { postAnimal } from "../../utils/functions"
 import { Toaster, SuccessToast, ErrorToast } from "../../Components/Toasts"
 
 import { MdAdd } from "react-icons/md"
+import Container from "../../Components/Container"
 
-// console.clear()
+console.clear()
 
 const randomId = uuid()
 
-export default function Home() {
+const postsCollectionRef = collection(db, "posts")
+
+export default function Home({ filter }) {
     const uid = localStorage.getItem("uid")
     const [ drawers, setDrawers ] = useState({
         add: false
     })
     const [ displayName ] = useAtom(userName)
-    const [ animals, setAnimals ] = useAtom(animalsData)
-    // const [ animals, setAnimals ] = useState([])
+    const [ rawAnimals, setRawAnimals ] = useAtom(animalsData)
+    const [ animals, setAnimals ] = useState([])
+
+    if (filter == "") {
+        setAnimals(rawAnimals)
+    }
+    else {
+        console.log(animals)
+        console.log("applied filter:", filter)
+    }
+
     const [ newAnimal, setNewAnimal ] = useState(animalObject(displayName, uid, randomId))
 
     function push() {
@@ -94,6 +104,7 @@ export default function Home() {
             label: "price",
             type: "number",
             value: newAnimal.price,
+            desc: "in rupees",
             onChange: e => handleChange(e.target, "price")
         },
         {
@@ -114,80 +125,52 @@ export default function Home() {
         },
     ]
 
-    async function fetchAnimals() {
-        const docsSanp = await getDocs(collection(db, "posts")).then(res => res).catch(err => err)
-        const arr = []
-        docsSanp.forEach(element => {
-            arr.push(element.data())
-            setAnimals(arr)
-        });
+    async function fetchAnimals(filter) {
+        if (filter) {
+            const q = query(postsCollectionRef, where("animal", "==", filter));
+            const arr = []
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach(doc => {
+                arr.push(doc.data())
+                setAnimals(arr)
+            });
+        }
+        else {
+            const docsSanp = await getDocs(postsCollectionRef).then(res => res).catch(err => err)
+            const arr = []
+            docsSanp.forEach(element => {
+                arr.push(element.data())
+                setAnimals(arr)
+            });
+        }
     }
 
+
     useEffect(() => {
-        fetchAnimals()
+        fetchAnimals(filter)
     }, [])
 
     return (
-        <div className={`  ${container.scrollPadding} min-h-screen `} >
+        <div className={`  ${container.scrollPadding} min-h-screen flex  cursor-pointer`} >
             <Toaster />
 
-            <Button
-                className=" absolute bottom-8 right-8   rounded-full aspect-square h-fit p-1.5"
-                label={<MdAdd size="1.5em" />}
-                onClick={() => setDrawers({ ...drawers, add: true })} />
+            <div onClick={() => setDrawers({ ...drawers, add: true })} className="flex flex-col items-end justify-end fixed bottom-0 right-8 group " >
+                <Button className=" justify-self-end rounded-full aspect-square w-fit p-1.5" label={<MdAdd size="1.5em" />} />
+                <p className="-top-24 left-3 opacity-0 bg-gray-300 p-1 capitalize font-medium px-2 rounded-md relative group-hover:opacity-100" >add post</p>
+            </div>
 
 
             <Drawer label="Post a pet" open={drawers.add} onClose={() => setDrawers({ ...drawers, add: false })}  >
                 <div className="h-full flex flex-col gap-2">
                     {selects.map(({ label, options, value, onChange }) => <Select key={label} value={value} label={label} options={options} onChange={onChange} />)}
-                    {inputs.map(({ label, type, value, onChange }) => <Input key={label} label={label} type={type} value={value} onChange={onChange} />)}
+                    {inputs.map(({ label, type, value, onChange, desc }) => <Input key={label} label={label} desc={desc} type={type} value={value} onChange={onChange} />)}
                     <img src={newAnimal.image} alt="" />
                     <Button label="Post" onClick={push} className="w-fit mx-auto" />
                 </div>
             </Drawer>
 
-            <div className="flex flex-col gap-2 p-2">
-                <Label label="Animals" optional={true} />
-                <div className=" columns-2 xl:columns-3 2xl:columns-6 gap-2">
-                    {animals.map(({ name, desc, health, injury, color, breed, author, time, uuid, image }) =>
-                        (<Card name={name} img={image} desc={desc} health={health} injury={injury} time={String(time)} author={author} color={color} breed={breed} />))}
-                </div>
-            </div>
+            <Container label="Animals" data={animals} />
 
         </div>
     )
 }
-
-
-{/* <div className=' flex w-full flex-col sm:block columns-2 px-8 py-16 items-center xl:columns-3 2xl:columns-4' >
-    {menuData.map((product) => {
-        return (
-            <>
-                <div key={product.name} className='flex flex-col p-1 xl:p-2 bg-transparent break-inside-avoid w-full  '>
-                    <div className="container p-2 md:p-4 my-2 mx-auto rounded-lg shadow-2xl productCard hover:scale-[1.025]">
-                        <div className="relative">
-                            <img className="w-max" src={product.image} alt="" />
-                        </div>
-                        <div className="m-2 text-gray-500">
-                            <span className='flex justify-between items-center' >
-                                <h1 className="  font-bold text-2xl">{product.name}</h1>
-                                <p className='dull-clr   font-bold text-lg' >{product.price}</p>
-                            </span>
-                            <p className="text-gray-500">{product.desc}</p>
-                            <div className='flex justify-end' >
-                                <button className='px-2 py-1 flex items-center gap-1 bg-blue-500 text-white rounded-lg hover:bgb-blue-600 ' >
-                                    5
-                                    <span className="text-white text-sm star material-symbols-outlined">
-                                        star
-                                    </span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </>
-        )
-    })}
-</div></> */}
-
-
