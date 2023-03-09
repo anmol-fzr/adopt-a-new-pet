@@ -10,16 +10,17 @@ import Select from "../../Components/Form/Select"
 import Button from "../../Components/Form/Button"
 import Modal from "../../Components/UI/Modal"
 
+
 // Styles
 import { container, interact } from "../../styles/style"
 
 // Firebase
-import { collection, getDocs, where, query, doc, deleteDoc, updateDoc } from "firebase/firestore"
+import { getDocs, where, query, doc, deleteDoc, updateDoc } from "firebase/firestore"
 import { db } from "../../firebase/firebaseConfig"
 
 // React Icons
-import { HiOutlineTrash, HiOutlinePencil } from "react-icons/hi"
-
+import { HiOutlinePencil } from "react-icons/hi"
+import { CgTrash } from "react-icons/cg"
 // Jotai
 import { useAtom } from "jotai"
 import { login, name as userName } from "../../utils/store"
@@ -27,11 +28,11 @@ import { login, name as userName } from "../../utils/store"
 // Options
 import { colors, healths, breeds, injuries } from "../../utils/options"
 import { animalObject } from "../../utils/extras"
-import { Toaster, SuccessToast, ErrorToast } from "../../Components/Toasts"
+import { Toaster, SuccessToast } from "../../Components/Toasts"
+import { postsCollectionRef } from "../../utils/functions"
 
 // console.clear()
-const uid = localStorage.getItem("uid")
-const postsCollectionRef = collection(db, "posts")
+const uid = localStorage.getItem("uid") 
 
 
 export default function MyPosts() {
@@ -150,7 +151,7 @@ export default function MyPosts() {
                         Cancel
                     </button>
                     <button onClick={deletePost} className={`  p-1  px-4 rounded-md flex items-center bg-red-100 hover:bg-red-200 text-red-500 ${interact.scale} ${interact.shadow} `} >
-                        <Icon onClick={trash} icon={<HiOutlineTrash />} color="red" effects={false} />
+                        <Icon onClick={trash} icon={<CgTrash />} color="red" effects={false} />
                         Delete
                     </button>
                 </div>
@@ -195,7 +196,7 @@ export default function MyPosts() {
 function Actions({ edit, trash }) {
     return (
         <div className="p-2 h-fit  flex gap-2 items-center  ">
-            <Icon onClick={trash} icon={<HiOutlineTrash />} color="red" />
+            <Icon onClick={trash} icon={<CgTrash />} color="red" />
             <Icon onClick={edit} icon={<HiOutlinePencil />} />
         </div>
     )

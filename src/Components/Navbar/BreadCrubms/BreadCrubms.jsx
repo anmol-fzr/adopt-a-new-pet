@@ -21,7 +21,6 @@ export default function BreadCrubms() {
         dogs: general.dogs,
         cattle: general.cattles,
         "my-posts": general.myPosts
-
     }
 
     const crumbs = [
@@ -46,11 +45,11 @@ export default function BreadCrubms() {
 
     return (
         subPage !== "login" &&
-        (<div div class="max-w-7xl mx-auto py-4 w-full ml-0 px-4 sm:px-6 lg:px-8 border-b border-gray-200 " >
-            <div class="flex items-center gap-x-2 text-gray-400 text-sm">
+        (<div className="max-w-7xl mx-auto py-4 w-full ml-0 px-4 sm:px-6 lg:px-8 shadow-sm" >
+            <div className="flex items-center gap-x-2 text-gray-400 text-sm">
                 {crumbs.map(({ label, to }) => {
-                    return (label && <Link to={to} className='flex items-center' >
-                        <p class="hover:underline capitalize hover:text-gray-600">{label}</p>
+                    return (label && <Link to={to} key={label} className='flex items-center' >
+                        <p className="hover:underline capitalize hover:text-gray-600">{label}</p>
                         <Icon icon={<CgChevronRight />} color="#d1d5db" size='1.6em' effects={false} />
                     </Link>
                     )

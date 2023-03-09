@@ -2,20 +2,36 @@ import { loadable } from "jotai/utils"
 import { atom } from 'jotai'
 
 export const login = atom(true)
-export const name = atom("")
-
 export const userId = loadable(atom(async get => get))
-export const profilePhoto = atom("")
-export const email = atom("")
+
+export const user = atom({
+    name: "",
+    email: "",
+    avatar: "",
+
+})
+
+export const filter = atom({
+    animal: "",
+    price: "",
+    breed: "",
+    color: "",
+})
+
+export const filters = atom({
+    animal: {
+        label: "animal",
+        operator: "==",
+        value: ""
+    },
+    price: "",
+    breed: "",
+    color: "",
+})
 
 
 
 export const animalsData = atom([])
-
-
-
-
-
 
 
 

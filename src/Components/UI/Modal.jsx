@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Modal as ModalUI, Group } from '@mantine/core';
-import { MdOutlineClose } from "react-icons/md"
+import { Modal as ModalUI, Group } from '@mantine/core'; 
+import { CgClose } from "react-icons/cg"
 import { interact } from '../../styles/style';
 import Icon from './Icon';
 
@@ -12,7 +12,7 @@ export default function Modal({ open, onClose, children, title }) {
                     <div className='flex w-full items-center justify-center '>
                         <p className='font-amonx text-xl w-full text-center font-bold text-accent'>{title}</p>
                         {onClose && <span onClick={onClose} className='mx-auto ml-0 cursor-pointer'>
-                            <Icon icon={<MdOutlineClose />} />
+                            <Icon icon={<CgClose />} />
                         </span>}
                     </div>
                     <div className=" w-full flex flex-col gap-4">

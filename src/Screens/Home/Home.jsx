@@ -11,47 +11,43 @@ import Input from "../../Components/Form/Input"
 import { container } from "../../styles/style"
 
 // Options
-import { colors, healths, breeds, injuries, animals as animalsOptions } from "../../utils/options"
+import { colors, healths, breeds, injuries, animals as animalsOptions, } from "../../utils/options"
 
-import { animalsData, name as userName } from "../../utils/store"
+import { animalsData, user } from "../../utils/store"
 
-// Firebase
-import { db } from "../../firebase/firebaseConfig"
-import { collection, getDocs, query, where } from "firebase/firestore"
-
-
+// Firebase 
+import { getDocs, query, where } from "firebase/firestore"
 import { v4 as uuid } from "uuid"
 import { animalObject } from "../../utils/extras"
-import { postAnimal } from "../../utils/functions"
+import { breedSelector, postAnimal, postsCollectionRef } from "../../utils/functions"
 import { Toaster, SuccessToast, ErrorToast } from "../../Components/Toasts"
 
-import { MdAdd } from "react-icons/md"
+import { CgMathPlus } from "react-icons/cg"
 import Container from "../../Components/Container"
 
-console.clear()
-
 const randomId = uuid()
-
-const postsCollectionRef = collection(db, "posts")
 
 export default function Home({ filter }) {
     const uid = localStorage.getItem("uid")
     const [ drawers, setDrawers ] = useState({
-        add: false
-    })
-    const [ displayName ] = useAtom(userName)
-    const [ rawAnimals, setRawAnimals ] = useAtom(animalsData)
+        add: false,
+    }) 
+
+    const [ loggedUser, setLoggedUser ] = useAtom(user)
+
+
+    const [ rawAnimals ] = useAtom(animalsData)
     const [ animals, setAnimals ] = useState([])
 
-    if (filter == "") {
-        setAnimals(rawAnimals)
-    }
-    else {
-        console.log(animals)
-        console.log("applied filter:", filter)
-    }
+    // if (filter == "") {
+    //     setAnimals(rawAnimals)
+    // }
+    // else {
+    //     // console.log(animals)
+    //     // console.log("applied filter:", filter)
+    // }
 
-    const [ newAnimal, setNewAnimal ] = useState(animalObject(displayName, uid, randomId))
+    const [ newAnimal, setNewAnimal ] = useState(animalObject(loggedUser.name, uid, randomId, loggedUser.avatar))
 
     function push() {
         const res = postAnimal(newAnimal, randomId)
@@ -59,7 +55,7 @@ export default function Home({ filter }) {
 
         setDrawers({ ...drawers, add: false })
         console.log(newAnimal)
-        window.location.reload(true)
+        // window.location.reload(true)
     }
 
     function handleChange(e, key) {
@@ -81,7 +77,7 @@ export default function Home({ filter }) {
         },
         {
             label: "breed",
-            options: breeds,
+            options: breedSelector(newAnimal.animal),
             value: newAnimal.breed,
             onChange: e => handleChange(e, "breed")
         },
@@ -97,6 +93,8 @@ export default function Home({ filter }) {
             value: newAnimal.health,
             onChange: e => handleChange(e, "health")
         },
+
+
     ]
 
     const inputs = [
@@ -125,9 +123,25 @@ export default function Home({ filter }) {
         },
     ]
 
+    function createFilterQuery(value) {
+        if (value == "any" || value == "unknown" || value == "other") return
+        // return const Query = where("animal", '==', value)
+    }
+
     async function fetchAnimals(filter) {
+
+        // const animalQuery = where("animal", '==', animal)
+        // const breedQuery = where("breed", '==', breed)
+        // const colorQuery = where("color", '==', color)
+        // const priceQuery = where("price", '<=', price)
+
+        // const q = query(postsCollectionRef, animalQuery, breedQuery, colorQuery, priceQuery);
+
         if (filter) {
             const q = query(postsCollectionRef, where("animal", "==", filter));
+            // const q = query(postsCollectionRef, where("breed", "==", "dobermann"));
+            // const q = query(postsCollectionRef, where("color", "==", "ginger"));
+            // const q = query(postsCollectionRef, where("price", "<=", "ginger"));
             const arr = []
             const querySnapshot = await getDocs(q);
             querySnapshot.forEach(doc => {
@@ -155,7 +169,7 @@ export default function Home({ filter }) {
             <Toaster />
 
             <div onClick={() => setDrawers({ ...drawers, add: true })} className="flex flex-col items-end justify-end fixed bottom-0 right-8 group " >
-                <Button className=" justify-self-end rounded-full aspect-square w-fit p-1.5" label={<MdAdd size="1.5em" />} />
+                <Button className=" justify-self-end rounded-full aspect-square w-fit p-1.5" label={<CgMathPlus size="1.5em" />} />
                 <p className="-top-24 left-3 opacity-0 bg-gray-300 p-1 capitalize font-medium px-2 rounded-md relative group-hover:opacity-100" >add post</p>
             </div>
 
@@ -168,6 +182,9 @@ export default function Home({ filter }) {
                     <Button label="Post" onClick={push} className="w-fit mx-auto" />
                 </div>
             </Drawer>
+
+
+
 
             <Container label="Animals" data={animals} />
 

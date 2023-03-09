@@ -1,60 +1,20 @@
-import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "firebase/auth";
+import { signInWithPopup } from "firebase/auth";
 import { auth, GoogleAuth } from "../../firebase/firebaseConfig";
 import { useNavigate } from "react-router-dom"
 import { container } from "../../styles/style";
-// import { useAtom } from "jotai"
-// import { login, name, profilePhoto } from "../../utils/store";
 
-export default function Login({ }) {
-    // const [ loggedIn, setLoggedIn ] = useAtom(login)
-    // const [ displayName, setDisplayName ] = useAtom(name)
-    // const [ photoURL, setPhotoURL ] = useAtom(profilePhoto)
-
+export default function Login({ }) { 
     const navigate = useNavigate()
 
     const googleSignIn = () => {
         signInWithPopup(auth, GoogleAuth)
-            .then(result => {
-                const credential = GoogleAuthProvider.credentialFromResult(result);
-                const token = credential.accessToken;
-                // The signed-in user info.
-                const user = result.user;
-                // IdP data available using getAdditionalUserInfo(result)
-                // ...
-                // console.log(result)
+            .then(() => { 
                 navigate("/")
-            }).catch(error => {
-                // Handle Errors here.
-                // const errorCode = error.code;
-                console.log(error)
-                // const errorMessage = error.message;
-                // // The email of the user's account used.
-                // const email = error.customData.email;
-                // // The AuthCredential type that was used.
-                // const credential = GoogleAuthProvider.credentialFromError(error);
-                // ...
+            }).catch(error => { 
+                console.log(error) 
             })
     };
 
-    // onAuthStateChanged(auth, user => {
-    //     if (user) {
-    //         setDisplayName(user.displayName)
-
-    //         localStorage.setItem("email", user.email)
-
-    //         setLoggedIn(true)
-
-    //         setPhotoURL(user.photoURL)
-    //         localStorage.setItem("uid", user.uid)
-    //     }
-    //     else {
-    //         localStorage.setItem("email", "")
-    //         setLoggedIn(false)
-    //         // localStorage.setItem("login", false)
-    //         localStorage.setItem("photoURL", "")
-    //         localStorage.setItem("uid", "")
-    //     }
-    // })
 
     return (
         <section className={`  ${container.scrollPadding}   min-h-screen flex items-center justify-center`}>

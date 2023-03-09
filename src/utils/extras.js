@@ -17,7 +17,7 @@
 // }
 
 
-export function animalObject(name, uid, uuid) {
+export function animalObject(name, uid, uuid, photo) {
     return {
         color: "brown",
         breed: "unknown",
@@ -33,6 +33,7 @@ export function animalObject(name, uid, uuid) {
         author: {
             name,
             uid,
+            photo
         },
         uuid
     }
